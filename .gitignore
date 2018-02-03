@@ -1,2 +1,7 @@
 RobotTwitterBotCredentials.py
 __pycache__
+
+#ReplyBot
+ReplyBot/secrets.py
+ReplyBot/*.png
+ReplyBot/__pycache__/*
