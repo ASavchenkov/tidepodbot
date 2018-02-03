@@ -3,6 +3,8 @@ import time
 import sys
 import requests
 import RobotTwitterBotCredentials
+import picamera
+from PIL import Image
 
 class RobotTwitterBot:
     def __init__(self):
@@ -14,6 +16,7 @@ class RobotTwitterBot:
         self.userhandle = "tidepotrobotmid"
         self.tidepodIdentifierHandle = "tidepodbot"
         self.debug = True
+        
 
     def dPrint(self , s):
         if self.debug:
@@ -58,3 +61,39 @@ class RobotTwitterBot:
             self.dPrint("status is longer than 1!")
             
         return status[0]
+
+class CameraOp:
+  def __init__(self):
+    self.n=1000
+    self.resolution = (2*self.n,self.n)
+    self.camera = None
+    
+  def initCamera(self,timeToSleep=2):
+    self.camera = picamera.PiCamera()  
+    time.sleep(timeToSleep)
+    self.camera.resolution = (2*self.n,self.n)
+    
+  def take_picture(self,filename):
+    assert self.camera!=None #camera probably not init yet
+    self.camera.capture(filename)
+    
+  def split_image(self,in_filename,out_filename_left,out_filename_right):
+    in_im = Image.open(in_filename)
+
+    im_left= im.copy().crop((0,0,self.n,self.n))
+    im_right= im.copy().crop((self.n,0,2*self.n,self.n))
+    
+    with open(out_filename_left,'wb') as outfile:
+      im_left.save(outfile, "JPEG")
+    with open(out_filename_right,'wb') as outfile:
+	    im_right.save(outfile, "JPEG")
+
+
+if __name__=='__main__':
+  co = CameraOp()
+  Robot = RobotTwitterBot()
+  co.initCamera()
+  co.take_picture("ravi.jpg")
+  Robot.makeRequest("ravi.jpg","ROLL TIDEEEE")
+  
+  
