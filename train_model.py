@@ -6,7 +6,6 @@ from torch.autograd import Variable
 import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
 import time
 import os
 import copy
@@ -28,14 +27,15 @@ data_transforms = {
 
 data_dir = 'images'
 
-sample_weights = {'train': [6950/7050, 100/7050], 'test' : [2980/3028, 48/3028]}
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])
-                  for x in ['train', 'val']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
-                                             shuffle=True, sampler = sampler,
+                    for x in ['train', 'val']}
+# samplers = {x : torch.utils.data.sampler.WeightedRandomSampler([10000,1],7000,True)
+        # for x in ['train','val']}
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=20,
+                                             shuffle=True, 
                                              num_workers=4)
-              for x in ['train', 'val']}
+                    for x in ['train', 'val']}
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 class_names = image_datasets['train'].classes
 
@@ -52,7 +52,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         print('-' * 10)
 
         # Each epoch has a training and validation phase
-        for phase in ['train', 'val']:
+        for phase in ['train','val']:
             if phase == 'train':
                 scheduler.step()
                 model.train(True)  # Set model to training mode
