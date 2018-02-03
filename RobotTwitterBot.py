@@ -26,6 +26,8 @@ class RobotTwitterBot:
         """
         Makes a request to the tidepodIdentifierHandle Twitter bot using the
         image path
+
+        image path can be a string or a list of strings
         
         Returns the response of that twitter account, stripped of the @userhandle
         """
@@ -40,7 +42,15 @@ class RobotTwitterBot:
         Sends media tweet to username with the image
         """
         message = "@{} {}".format(username , message)
-        status = self.api.update_with_media(image_name , message)
+        status = None
+        if type(image_name) == list:
+            media_ids = []
+            for filename in image_name:
+                 res = self.api.media_upload(filename)
+                 media_ids.append(res.media_id)
+            status = self.api.update_status(status=message , media_ids=media_ids)
+        else:
+            status = self.api.update_with_media(image_name , message)
         return status
 
     def getReplyTweet(self , username ,  tweet_id , trys = 10):
