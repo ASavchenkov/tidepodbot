@@ -27,11 +27,14 @@ data_transforms = {
 }
 
 data_dir = 'images'
+
+sample_weights = {'train': [6950/7050, 100/7050], 'test' : [2980/3028, 48/3028]}
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])
                   for x in ['train', 'val']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
-                                             shuffle=True, num_workers=4)
+                                             shuffle=True, sampler = sampler,
+                                             num_workers=4)
               for x in ['train', 'val']}
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 class_names = image_datasets['train'].classes
