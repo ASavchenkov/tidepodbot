@@ -56,5 +56,7 @@ if __name__ == '__main__':
         p = rootdir + f
         img = Image.open(p) 
         
+        
         result = classifier.classify_image(img)
-    
+        if result==0:
+            print(p)
