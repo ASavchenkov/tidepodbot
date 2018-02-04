@@ -7,6 +7,7 @@ import tweepy
 from PIL import Image
 from PIL import ImageFile
 from secrets import *
+import logging
 
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -73,9 +74,7 @@ def tidePodOrNah(url, username, status_id):
         i.save(filename)
         #classify image
         '''
-
-        tweet = ("@{} this may or may not be a tide pod...".format(username))
-        api.update_status(tweet, in_reply_to_status_id=status_id)
+        return True
 
 def generateResponse():
     return
@@ -90,22 +89,100 @@ def getFollowers(api, username):
     for friend in user.friends():
         print(friend.screen_name)
 
-#create a class inherithing from the tweepy  StreamListener
+def respond(tide, tweet, username, hashtags):
+    if 'shutdown' in tweet:
+        raise Exception
+    reply = '' 
+    tideFound = False
+
+    for t in tide:
+        if(t[1]):
+            tideFound = True
+            reply += '1'
+        else:
+            reply += '0'
+
+        reply += ','
+
+    if(tideFound): #TidePod
+
+        reply = DoThIsToTwEeT(tweet, username)
+    else: #NotTidePod
+        reply = scrambleTweet(tweet)
+        #reply = DoThIsToTwEeT(tweet, username)
+    return reply
+
+def DoThIsToTwEeT(tweet, username):
+    words = tweet.split(' ')
+    respond = []
+    reply = ' '
+    for word in words:
+        if(word == username or words[1:]==username):
+            respond.append(word)
+            continue
+        temp = ''
+        for i,c in enumerate(word):
+            if(i%2==0):
+                temp += c.upper()
+            else:
+                temp += c.lower()
+        respond.append(temp)
+    return reply.join(respond)
+
+def scrambleTweet(tweet):
+    words = tweet.split(' ')
+    randomWords = []
+    reply = ' '
+    while(len(words) > 0):
+        word = words.pop( random.randrange(len(words)) )
+        randomWords.append(word)
+    return reply.join(randomWords)
+
+#create a class in
+#herithing from the tweepy  StreamListener
 class BotStreamer(tweepy.StreamListener):
 
     # Called when a new status arrives which is passed down from the on_data method of the StreamListener
     def on_status(self, status):
+        print('here')
         username = status.user.screen_name 
         status_id = status.id
+        print(status_id)
 
-    #entities provide structured data from Tweets including resolved URLs, media, hashtags and mentions without having to parse the text to extract that information
+        if(username == 'tidepodbot'):
+            print('tweeting at self')
+            return
+
+        tweet = status.text
+        hashtags = []
+        if 'hashtags' in status.entities:
+            for hashtag in status.entities['hashtags']:
+                hashtags.apped(hashtag['text'])
+
+        # ntities provide strured data from Tweets including resolved URLs, media, hashtags 
+        # and mentions without having to parse the text to extract that information
+        tidePods = []
         if 'media' in status.entities:
-            for image in status.entities['media']:
+            for index, image in enumerate(status.entities['media']):
                 #tweet_image(image['media_url'], username, status_id)
-                tidePodOrNah(image['media_url'], username, status_id)
+                tide = tidePodOrNah(image['media_url'])
+                tidePods.append((index, tide)) #tuple index and if tidePod
+
+        reply = respond(tidePods, tweet, username, hashtags)
+
+        #tweet = ("@{} this may or may not be a tide pod...".format(username))
+        api.update_status( ('@{} ' + reply).format(username), in_reply_to_status_id=status_id)
 
 myStreamListener = BotStreamer()
 
- #Construct the Stream instance
+#Construct the Stream instance
+
 stream = tweepy.Stream(auth, myStreamListener)
-stream.filter(track=['@tidepodbot'])
+print('start')
+try:
+    stream.filter(track=['@tidepodbot'])
+except Exception as e:
+    logging.exception("Something awful happened!")
+    print('something is broken')
+stream.disconnect()
+print('stop')
