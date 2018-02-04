@@ -22,7 +22,7 @@ void loop() {
   char character;
   if (Serial.available()) {
     character = Serial.read();
-    if(character == ' '){
+    if(character == 'q'){
       nextCommand = command;
       command = "";
     }
@@ -32,14 +32,16 @@ void loop() {
   }
 
   if(nextCommand != ""){
-    writeString(nextCommand);
     if(nextCommand == "F"){
+      writeString("forward\n");
       GoForward();
     }
     else if(nextCommand == "R"){
+      writeString("right\n");
       TurnRight();
     }
     else if(nextCommand == "L"){
+      writeString("left\n");
       TurnLeft();
     }
   }
@@ -48,9 +50,9 @@ void loop() {
 void GoForward(){
   Motor_Right.setSpeed(200);
   Motor_Left.setSpeed(200);
-  Motor_Right.run(FORWARD);
-  Motor_Left.run(BACKWARD);
-  delay(1000);
+  Motor_Right.run(BACKWARD);
+  Motor_Left.run(FORWARD);
+  delay(500);
   Motor_Right.run(RELEASE);
   Motor_Left.run(RELEASE);
 }
@@ -58,9 +60,9 @@ void GoForward(){
 void TurnLeft(){
   Motor_Right.setSpeed(200);
   Motor_Left.setSpeed(200);
-  Motor_Right.run(FORWARD);
-  Motor_Left.run(FORWARD);
-  delay(1000);
+  Motor_Right.run(BACKWARD);
+  Motor_Left.run(BACKWARD);
+  delay(500);
   Motor_Right.run(RELEASE);
   Motor_Left.run(RELEASE);
 }
@@ -68,9 +70,9 @@ void TurnLeft(){
 void TurnRight(){
   Motor_Right.setSpeed(200);
   Motor_Left.setSpeed(200);
-  Motor_Right.run(BACKWARD);
-  Motor_Left.run(BACKWARD);
-  delay(1000);
+  Motor_Right.run(FORWARD);
+  Motor_Left.run(FORWARD);
+  delay(500);
   Motor_Right.run(RELEASE);
   Motor_Left.run(RELEASE);
 }
