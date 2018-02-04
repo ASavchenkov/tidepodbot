@@ -15,7 +15,7 @@ input_transform = transforms.Compose([
     ])
 
 class Classifier:
-    def __init__(self, param_path, try_gpu = True):
+    def __init__(self, param_path, try_gpu = False):
         self.model = models.resnet18()
 
         num_ftrs = self.model.fc.in_features

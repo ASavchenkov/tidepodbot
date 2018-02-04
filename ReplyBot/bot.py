@@ -79,10 +79,10 @@ def tidePodOrNah(url):
         # '''
         classification = classifier.classify_image(i)
         if classification ==1:
-            i.save('./pods/'+str(random.randint(0,99999999))+'jpg','jpeg')
+            i.save('./pods/'+str(random.randint(0,99999999))+'.jpg','jpeg')
             return True
         else:
-            i.save('./negatives/'+str(random.randint(0,99999999))+ 'jpg','jpeg')
+            i.save('./negatives/'+str(random.randint(0,99999999))+ '.jpg','jpeg')
             return False
 
 def generateResponse():
