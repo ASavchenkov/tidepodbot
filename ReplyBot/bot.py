@@ -74,13 +74,15 @@ def tidePodOrNah(url):
         # read data from downloaded bytes and returns a PIL.Image.Image object
         i = Image.open(BytesIO(request.content))
         # Saves the image under the given filename
-        # i.save(filename)
+         
         #classify image
         # '''
         classification = classifier.classify_image(i)
         if classification ==1:
+            i.save('./pods/'+str(random.randint(0,99999999))+'jpg','jpeg')
             return True
         else:
+            i.save('./negatives/'+str(random.randint(0,99999999))+ 'jpg','jpeg')
             return False
 
 def generateResponse():
@@ -110,10 +112,10 @@ def respond(tide, tweet, username, hashtags):
     else:
         
         if(tide[0][1]): #TidePod
-            reply = 'that\'s not food. That\'s a tide pod!'
+            reply = 'That\'s not food! That\'s a tide pod!'
             # reply = DoThIsToTwEeT(tweet, username)
         else: #NotTidePod
-            reply = 'nope, you\'re good!'
+            reply = 'I don\'t think that\'s a tide pod. You\'re good!'
             # reply = scrambleTweet(tweet)
             #reply = DoThIsToTwEeT(tweet, username)
     return reply
@@ -164,7 +166,7 @@ class BotStreamer(tweepy.StreamListener):
         hashtags = []
         if 'hashtags' in status.entities:
             for hashtag in status.entities['hashtags']:
-                hashtags.apped(hashtag['text'])
+                hashtags.append(hashtag['text'])
 
         # ntities provide strured data from Tweets including resolved URLs, media, hashtags 
         # and mentions without having to parse the text to extract that information
