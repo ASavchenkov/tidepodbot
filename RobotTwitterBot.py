@@ -4,6 +4,7 @@ import sys
 import requests
 import RobotTwitterBotCredentials
 import picamera
+import serial
 from PIL import Image
 
 class RobotTwitterBot:
@@ -90,20 +91,48 @@ class CameraOp:
   def split_image(self,in_filename,out_filename_left,out_filename_right):
     in_im = Image.open(in_filename)
 
-    im_left= im.copy().crop((0,0,self.n,self.n))
-    im_right= im.copy().crop((self.n,0,2*self.n,self.n))
+    im_left= in_im.copy().crop((0,0,self.n,self.n))
+    im_right= in_im.copy().crop((self.n,0,2*self.n,self.n))
     
     with open(out_filename_left,'wb') as outfile:
       im_left.save(outfile, "JPEG")
     with open(out_filename_right,'wb') as outfile:
 	    im_right.save(outfile, "JPEG")
+         
+    
+def send_packet_to_robot(response):
+  
+  
+  response = [i == "1" for i in response.split(",")]
+  output='F'
+  
+  if response[0]=response[1]: #left and right arent 
+  
+    if response[0] and not response[1]: # right cond
+      output = 'R'
+    else: #left cond
+      output = 'L'
+  output+=" "
+  port =serial.Serial("/dev/tty", 9600,timeout=1)
+  assert port.isOpen()
+  port.write(output)
+  port.close()
+  
+    
 
+print(port.isOpen()) 
+
+port.write("F")
+rcv = port.read(10)
+print(rcv)
 
 if __name__=='__main__':
   co = CameraOp()
   Robot = RobotTwitterBot()
   co.initCamera()
   co.take_picture("ravi.jpg")
-  Robot.makeRequest("ravi.jpg","ROLL TIDEEEE")
+  co.split_image("ravi.jpg","l.jpg","r.jpg")
+
+  resp = Robot.makeRequest(["l.jpg","r.jpg"],"")
   
   
