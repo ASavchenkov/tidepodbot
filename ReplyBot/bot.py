@@ -90,6 +90,8 @@ def getFollowers(api, username):
         print(friend.screen_name)
 
 def respond(tide, tweet, username, hashtags):
+    if 'shutdown' in tweet:
+        raise Exception
     reply = '' 
     tideFound = False
 
@@ -103,11 +105,12 @@ def respond(tide, tweet, username, hashtags):
         reply += ','
 
     if(tideFound): #TidePod
+
         reply = DoThIsToTwEeT(tweet, username)
     else: #NotTidePod
-        #reply = scrambleTweet(tweet)
-        reply = DoThIsToTwEeT(tweet, username)
-    return tweet
+        reply = scrambleTweet(tweet)
+        #reply = DoThIsToTwEeT(tweet, username)
+    return reply
 
 def DoThIsToTwEeT(tweet, username):
     words = tweet.split(' ')
@@ -141,6 +144,7 @@ class BotStreamer(tweepy.StreamListener):
 
     # Called when a new status arrives which is passed down from the on_data method of the StreamListener
     def on_status(self, status):
+        print('here')
         username = status.user.screen_name 
         status_id = status.id
         print(status_id)
@@ -174,9 +178,11 @@ myStreamListener = BotStreamer()
 #Construct the Stream instance
 
 stream = tweepy.Stream(auth, myStreamListener)
-
+print('start')
 try:
-    stream.filter(track=['@tidepodbot'], async=True)
+    stream.filter(track=['@tidepodbot'])
 except Exception as e:
     logging.exception("Something awful happened!")
-    stream.disconnect()
+    print('something is broken')
+stream.disconnect()
+print('stop')
