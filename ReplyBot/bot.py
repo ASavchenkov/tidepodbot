@@ -181,6 +181,9 @@ stream = tweepy.Stream(auth, myStreamListener)
 print('start')
 try:
     stream.filter(track=['@tidepodbot'])
+except KeyboardInterrupt:
+    print('exiting gracefully')
+    stream.disconnect()
 except Exception as e:
     logging.exception("Something awful happened!")
     print('something is broken')
