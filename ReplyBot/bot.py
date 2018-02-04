@@ -100,23 +100,22 @@ def respond(tide, tweet, username, hashtags):
     if 'shutdown' in tweet:
         raise Exception
     reply = '' 
-    tideFound = False
-
-    for t in tide:
-        if(t[1]):
-            tideFound = True
-            reply += '1'
-        else:
-            reply += '0'
-
-        reply += ','
-
-    if(tideFound): #TidePod
-        reply = 'that\'s not food. That\'s a tide pod!'
-        # reply = DoThIsToTwEeT(tweet, username)
-    else: #NotTidePod
-        reply = scrambleTweet(tweet)
-        #reply = DoThIsToTwEeT(tweet, username)
+    if(len(tide)>1):
+        for t in tide:
+            if(t[1]):
+                reply += '1'
+            else:
+                reply += '0'
+            reply += ','
+    else:
+        
+        if(tide[0][1]): #TidePod
+            reply = 'that\'s not food. That\'s a tide pod!'
+            # reply = DoThIsToTwEeT(tweet, username)
+        else: #NotTidePod
+            reply = 'nope, you\'re good!'
+            # reply = scrambleTweet(tweet)
+            #reply = DoThIsToTwEeT(tweet, username)
     return reply
 
 def DoThIsToTwEeT(tweet, username):
@@ -171,7 +170,7 @@ class BotStreamer(tweepy.StreamListener):
         # and mentions without having to parse the text to extract that information
         tidePods = []
         if 'media' in status.entities:
-            for index, image in enumerate(status.entities['media']):
+            for index, image in enumerate(status.extended_entities['media']):
                 #tweet_image(image['media_url'], username, status_id)
                 tide = tidePodOrNah(image['media_url'])
                 tidePods.append((index, tide)) #tuple index and if tidePod
