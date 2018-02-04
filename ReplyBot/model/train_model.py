@@ -25,7 +25,7 @@ data_transforms = {
     ]),
 }
 
-data_dir = 'images'
+data_dir = 'data'
 
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])

@@ -48,7 +48,7 @@ class Classifier:
 
 
 if __name__ == '__main__':
-    rootdir = './images/val/tidepod/'
+    rootdir = './data/val/tidepod/'
 
     classifier = Classifier('/.best_model')
 
