@@ -2,8 +2,8 @@ import PIL
 from PIL import Image
 import os
 
-rootin = './Tidepods/'
-rootout = './smallTidepods/'
+rootin = './bigtidepod/'
+rootout = './tidepod/'
 
 
 for f in os.listdir(rootin):
