@@ -20,7 +20,7 @@ class Classifier:
 
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, 2)
-        self.model.load_state_dict(torch.load('./best_model'))
+        self.model.load_state_dict(torch.load(param_path))
         self.model.train(False)
         
         self.use_gpu = try_gpu and torch.cuda.is_available()
@@ -41,6 +41,7 @@ class Classifier:
             inVar = Variable(inTensor)
         
         output = self.model(inVar)
+        print(output)
         _, pred = torch.max(output.data, 1)
 
         return pred.cpu().numpy()[0]

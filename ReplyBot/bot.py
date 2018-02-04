@@ -8,6 +8,7 @@ from PIL import Image
 from PIL import ImageFile
 from secrets import *
 import logging
+from model.inference import Classifier
 
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -20,6 +21,8 @@ auth.set_access_token(access_token, access_secret)
 
  #Construct the API instance
 api = tweepy.API(auth) # create an API object
+
+classifier = Classifier('./model/best_model')
 
 def tweet_image(url, username, status_id):
     filename = 'temp.png'
@@ -62,19 +65,23 @@ def scramble(filename):
         result.paste(crop, box)
     result.save('scramble.png')
 
-def tidePodOrNah(url, username, status_id):
+def tidePodOrNah(url):
     # send a get request
     request = requests.get(url, stream=True)
     if (request.status_code == 200):
 
-        '''
+        # '''
         # read data from downloaded bytes and returns a PIL.Image.Image object
         i = Image.open(BytesIO(request.content))
         # Saves the image under the given filename
-        i.save(filename)
+        # i.save(filename)
         #classify image
-        '''
-        return True
+        # '''
+        classification = classifier.classify_image(i)
+        if classification ==1:
+            return True
+        else:
+            return False
 
 def generateResponse():
     return
@@ -105,8 +112,8 @@ def respond(tide, tweet, username, hashtags):
         reply += ','
 
     if(tideFound): #TidePod
-
-        reply = DoThIsToTwEeT(tweet, username)
+        reply = 'that\'s not food. That\'s a tide pod!'
+        # reply = DoThIsToTwEeT(tweet, username)
     else: #NotTidePod
         reply = scrambleTweet(tweet)
         #reply = DoThIsToTwEeT(tweet, username)
@@ -138,6 +145,7 @@ def scrambleTweet(tweet):
         randomWords.append(word)
     return reply.join(randomWords)
 
+        
 #create a class in
 #herithing from the tweepy  StreamListener
 class BotStreamer(tweepy.StreamListener):
@@ -171,6 +179,7 @@ class BotStreamer(tweepy.StreamListener):
         reply = respond(tidePods, tweet, username, hashtags)
 
         #tweet = ("@{} this may or may not be a tide pod...".format(username))
+        print(reply)
         api.update_status( ('@{} ' + reply).format(username), in_reply_to_status_id=status_id)
 
 myStreamListener = BotStreamer()
