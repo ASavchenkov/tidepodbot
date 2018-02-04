@@ -12,7 +12,8 @@ for f in os.listdir(rootin):
     img = Image.open(fulldir)
     
     shortsize = min(img.size)
-    factor = int(shortsize/224) -1
+    factor = shortsize/260
 
-    img = img.resize((img.size[0]//factor,img.size[1]//factor), PIL.Image.ANTIALIAS)
+    img = img.resize((int(img.size[0]//factor),int(img.size[1]//factor)), PIL.Image.ANTIALIAS)
+    print(img.size)
     img.save(rootout + f)
